@@ -1,3 +1,4 @@
+import { where } from "sequelize";
 import User from "../models/User";
 class UserController {
   async index(req, res) {
@@ -60,8 +61,73 @@ class UserController {
       Usuario: user,
     });
   }
-  async update(req, res) {}
-  async destroy(req, res) {}
+  async update(req, res) {
+    try {
+      const { id } = req.params;
+
+      const verifyUser = await User.findByPk(id);
+      /*       console.log();
+      console.log();
+      console.log(verifyUser); */
+
+      if (!verifyUser) {
+        return res.status(400).json({
+          mensagem: "Usuario não localizado",
+        });
+      }
+      const { nome, sobrenome, email, senha } = req.body;
+
+      if (!nome || !sobrenome || !email || !senha) {
+        return res.status(400).json({
+          mensagem: "Todos os campos devem ser preenchidos",
+        });
+      }
+      const [updateUser] = await User.update(
+        { nome, sobrenome, email, senha },
+        {
+          where: { id },
+        }
+      );
+
+      //console.log(updateUser);
+      //retona o numero de linhas afetadas;
+      if (updateUser === 0) {
+        return res.status(400).json({
+          mensagem: "Erro ao atualizar o usuario",
+        });
+      }
+
+      return res.status(200).json({
+        mensagem: "Dados atualizados com sucesso",
+      });
+    } catch (e) {
+      console.log(e);
+    }
+  }
+  async destroy(req, res) {
+    try {
+      const { id } = req.params;
+
+      if (!id) {
+        return res.status(400).json({
+          mensagem: "Id não localizado",
+        });
+      }
+      const userDelete = await User.destroy({
+        where: { id },
+      });
+      if (!userDelete) {
+        return res.status(400).json({
+          mensagem: "Erro ao deletar usuario",
+        });
+      }
+      return res.status(200).json({
+        mensagem: "Usuario removido com sucesso!",
+      });
+    } catch (e) {
+      console.log(e);
+    }
+  }
   async show(req, res) {
     try {
       const { id } = req.params;

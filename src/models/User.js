@@ -9,7 +9,7 @@ export default class User extends Model {
           type: DataTypes.STRING,
           allowNull: false,
           len: {
-            args: [2, 50],
+            args: [2, 250],
             msg: "O nome deve ter entre 2 e 50 caracteres",
           },
         },
@@ -31,13 +31,15 @@ export default class User extends Model {
       },
       {
         sequelize,
-      },
-      this.addHook("beforeSave", async (user) => {
-        if (user.senha) {
-          const salt = await bcrypt.genSalt(8);
-        }
-      })
+      }
     );
+    this.addHook("beforeSave", async (user) => {
+      if (user.senha) {
+        const salt = await bcrypt.genSalt(8);
+        const senhaHash = await bcrypt.hash(user.senha, salt);
+        user.senha = senhaHash;
+      }
+    });
     return this;
   }
 }
