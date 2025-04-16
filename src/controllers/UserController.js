@@ -1,5 +1,6 @@
 import { where } from "sequelize";
 import User from "../models/User";
+import bcrypt from "bcryptjs";
 class UserController {
   async index(req, res) {
     const users = await User.findAll();
@@ -82,8 +83,10 @@ class UserController {
           mensagem: "Todos os campos devem ser preenchidos",
         });
       }
+      let senhaHash = await bcrypt.hash(senha, 8);
+
       const [updateUser] = await User.update(
-        { nome, sobrenome, email, senha },
+        { nome, sobrenome, email, senha: senhaHash },
         {
           where: { id },
         }
