@@ -24,3 +24,7 @@ export default async (req, res, next) => {
     console.log(e);
   }
 };
+
+/* Aqui verifica se o usuario que esta logado é o admin ou se ele tem permissao(ele mesmo)
+ Exemplo: alterar o telefone, so o admin e o proprio usuario podem alterar o telefone
+*/

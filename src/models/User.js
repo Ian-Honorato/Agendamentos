@@ -1,5 +1,6 @@
 import Sequelize, { DataTypes, Model } from "sequelize";
 import bcrypt from "bcryptjs";
+import Carteira from "./Carteira";
 
 export default class User extends Model {
   static init(sequelize) {
@@ -55,6 +56,13 @@ export default class User extends Model {
         user.senha = await bcrypt.hash(user.senha, salt);
       }
     });
+    this.addHook("afterCreate", async (user) =>{
+      await Carteira.create({
+        user_id: user.id,
+        moedas: 30,
+      })
+    })
+
 
     return this;
   }
@@ -63,9 +71,25 @@ export default class User extends Model {
   }
 
   static associate(models) {
+    this.hasOne(models.Carteira, {
+      foreignKey: "user_id",
+      as: "carteira",
+    })
     this.hasMany(models.Contato, {
       foreignKey: "usuario_id",
       as: "contatos",
     });
+    this.hasMany(models.Conversa,{
+      foreignKey: "user_remetente",
+      as: "mensagemEnviada",
+    })
+    this.hasMany(models.Conversa,{
+      foreignKey: "user_destinatario",
+      as:"mensagemRecebida",
+    });
+    this.hasMany(models.Produto,{
+      foreignKey: "user_id",
+      as:"produto",
+    })
   }
 }

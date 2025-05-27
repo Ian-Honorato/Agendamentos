@@ -16,3 +16,5 @@ export default async (req, res, next) => {
 
   return next();
 };
+
+/* Aqui verifica se o usuario que esta logado é o admin */
